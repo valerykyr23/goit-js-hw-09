@@ -2,19 +2,14 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import Notiflix from 'notiflix';
 
-console.log(Notiflix);
 
-console.log(flatpickr);
 
 
 const startBtn = document.querySelector("button[data-start]");
-console.log(startBtn);
 
 const input = document.querySelector("#datetime-picker");
-console.log(input);
 
 const daysSpan = document.querySelector("span[data-days]");
-console.log(daysSpan);
 
 const minutesSpan = document.querySelector("span[data-minutes]");
 
@@ -22,34 +17,71 @@ const secondsSpan = document.querySelector("span[data-seconds]");
 
 const hoursSpan = document.querySelector("span[data-hours]");
 
-input.addEventListener("input", () => {
-    Notiflix.Notify.failure("Please choose a date in the future"); });
+
 
 startBtn.setAttribute('disabled', '');
 
-timerId = null;
+let timerId = null;
 
-startBtn.addEventListener("click", () => {
-     
-    timerId = setInterval(() => {
-      
-      
-  }, 1000);
- })
+
+
+
 
 const options = {
-//   minDate: "today",
+
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-      console.log(selectedDates[0]);
+    
+    
+
+    const delta = selectedDates[0] - new Date();
+
+    console.log(delta)
+     
+    if (selectedDates[0] < new Date()) {
+      
+      Notiflix.Notify.failure("Please choose a date in the future");
+      
+    return;
+    };
+
+    if (selectedDates[0] > new Date()) {
+      startBtn.removeAttribute('disabled', '');
+      return;
+    };
+
+    startBtn.addEventListener("click", () => {
+     
+    timerId = setInterval(() => {
+      
+      const resultFromConvartation = convertMs(delta);
+      // const resultAfterPad = addLeadingZero(resultFromConvartation);
+      setDateInSpan(resultFromConvartation);
+      
+  }, 1000);
+ })
       
   },
 };
 
 flatpickr("#datetime-picker", options);
+
+
+function addLeadingZero(value) { 
+  return toString(value).padStart(2, "0");
+}
+
+
+function setDateInSpan({ days, hours, minutes, seconds }) {
+
+      daysSpan.textContent = `${days}`;
+      minutesSpan.textContent = `${minutes}`;
+      secondsSpan.textContent = `${seconds}`;
+      hoursSpan.textContent = `${hours}`;
+}
 
 
 function convertMs(ms) {
